@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canelli Rewards</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #C8391A;
+    --red-dark: #A82E14;
+    --red-light: #FFF3F0;
+    --navy: #1B2B4B;
+    --bg: #F7F5F2;
+    --surface: #FFFFFF;
+    --border: rgba(0,0,0,0.1);
+    --text: #1A1A1A;
+    --text-muted: #6B6B6B;
+    --success-bg: #EAF5EA;
+    --success-text: #2E7D32;
+    --error-bg: #FDECEA;
+    --error-text: #C62828;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    color: var(--text);
+  }
+
+  .app { max-width: 420px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .logo-wrap { text-align: center; margin-bottom: 1.5rem; }
+  .logo { font-family: 'DM Serif Display', serif; font-size: 36px; color: var(--red); line-height: 1; }
+  .logo-sub { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted); margin-top: 4px; }
+
+  .card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .card-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="password"] {
+    width: 100%;
+    padding: 11px 14px;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--surface);
+    color: var(--text);
+    margin-bottom: 10px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  input:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(200,57,26,0.1); }
+
+  .btn {
+    width: 100%;
+    padding: 13px;
+    background: var(--red);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    display: block;
+    text-align: center;
+  }
+
+  .btn:hover { background: var(--red-dark); }
+  .btn:active { transform: scale(0.98); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--red);
+    border: 0.5px solid var(--red);
+    margin-top: 8px;
+  }
+
+  .btn-outline:hover { background: var(--red-light); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-muted);
+    border: 0.5px solid var(--border);
+    margin-top: 8px;
+  }
+
+  .btn-ghost:hover { background: var(--bg); }
+
+  .btn-sm {
+    width: auto;
+    padding: 7px 14px;
+    font-size: 13px;
+    display: inline-block;
+  }
+
+  .btn-navy {
+    background: var(--navy);
+  }
+
+  .btn-navy:hover { background: #0f1e36; }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    padding: 0;
+    margin-bottom: 1.25rem;
+  }
+
+  .rolls-track {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin: 1.25rem 0 0.75rem;
+  }
+
+  .roll-dot {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    transition: all 0.2s;
+  }
+
+  .roll-dot.filled {
+    background: var(--red);
+    border-color: var(--red);
+  }
+
+  .progress-text {
+    font-size: 13px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .reward-banner {
+    background: var(--red-light);
+    border: 1px solid var(--red);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    text-align: center;
+    color: var(--red);
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .alert {
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  .alert-success { background: var(--success-bg); color: var(--success-text); }
+  .alert-error { background: var(--error-bg); color: var(--error-text); }
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 1rem;
+  }
+
+  .metric {
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem;
+  }
+
+  .metric-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .metric-value { font-size: 24px; font-weight: 500; color: var(--text); }
+
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 1rem;
+  }
+
+  .tab {
+    flex: 1;
+    padding: 8px 4px;
+    border-radius: var(--radius-sm);
+    border: 0.5px solid var(--border);
+    background: var(--surface);
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-weight: 500;
+    transition: all 0.15s;
+    text-align: center;
+  }
+
+  .tab.active { background: var(--red); color: white; border-color: var(--red); }
+
+  .customer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 0.5px solid var(--border);
+    gap: 8px;
+  }
+
+  .customer-row:last-child { border-bottom: none; }
+
+  .customer-name { font-size: 14px; font-weight: 500; }
+  .customer-meta { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+
+  .mini-dots { display: flex; gap: 4px; margin-top: 5px; }
+  .mini-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); }
+  .mini-dot.filled { background: var(--red); }
+
+  .reward-chip {
+    display: inline-block;
+    background: var(--red-light);
+    color: var(--red);
+    border: 0.5px solid var(--red);
+    border-radius: 20px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .search-box {
+    width: 100%;
+    padding: 10px 14px;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--surface);
+    color: var(--text);
+    margin-bottom: 10px;
+    outline: none;
+  }
+
+  .search-box:focus { border-color: var(--red); }
+
+  .admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-state {
+    text-align: center;
+    padding: 2rem 0;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  .admin-link {
+    text-align: center;
+    margin-top: 1rem;
+  }
+
+  .link-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    text-decoration: underline;
+  }
+
+  .how-it-works p { font-size: 13px; color: var(--text-muted); line-height: 1.7; }
+  .how-it-works strong { color: var(--text); }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <div class="screen active" id="screen-home">
+    <div class="logo-wrap">
+      <div class="logo">Canelli</div>
+      <div class="logo-sub">Rewards Program</div>
+    </div>
+    <div class="card">
+      <p style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:1.25rem;">Join Canelli Rewards and earn a <strong style="color:var(--text);">$2 discount</strong> for every 5 rolls you buy. Handcrafted in Orlando, FL. 🍥</p>
+      <button class="btn" onclick="show('screen-register')">Join now — it's free</button>
+      <button class="btn btn-outline" onclick="show('screen-login')">I already have an account</button>
+    </div>
+    <div class="admin-link">
+      <button class="link-btn" onclick="show('screen-admin-login')">Admin access</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-register">
+    <button class="back-btn" onclick="show('screen-home')">&#8592; Back</button>
+    <div class="logo-wrap">
+      <div class="logo">Canelli</div>
+      <div class="logo-sub">Create account</div>
+    </div>
+    <div class="card">
+      <div id="reg-alert"></div>
+      <input type="text" id="reg-first" placeholder="First name" />
+      <input type="text" id="reg-last" placeholder="Last name" />
+      <input type="email" id="reg-email" placeholder="Email address" />
+      <input type="tel" id="reg-phone" placeholder="Phone number (optional)" />
+      <button class="btn" id="reg-btn" onclick="registerCustomer()">Create my account</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-login">
+    <button class="back-btn" onclick="show('screen-home')">&#8592; Back</button>
+    <div class="logo-wrap">
+      <div class="logo">Canelli</div>
+      <div class="logo-sub">Welcome back</div>
+    </div>
+    <div class="card">
+      <div id="login-alert"></div>
+      <input type="email" id="login-email" placeholder="Your email address" />
+      <button class="btn" id="login-btn" onclick="loginCustomer()">View my rewards</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-dashboard">
+    <button class="back-btn" onclick="show('screen-home')">&#8592; Back</button>
+    <div class="logo-wrap">
+      <div class="logo">Canelli</div>
+      <div class="logo-sub">My rewards</div>
+    </div>
+    <div class="card">
+      <div class="card-label" id="dash-greeting">Hello!</div>
+      <div class="rolls-track" id="dash-dots"></div>
+      <p class="progress-text" id="dash-progress"></p>
+      <div id="dash-reward"></div>
+    </div>
+    <div class="card how-it-works">
+      <div class="card-label">How it works</div>
+      <p>Buy <strong>5 rolls</strong>, earn <strong>$2 off</strong> your next order. Show this screen to Canelli at your next visit to redeem your reward.</p>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-admin-login">
+    <button class="back-btn" onclick="show('screen-home')">&#8592; Back</button>
+    <div class="logo-wrap">
+      <div class="logo">Canelli</div>
+      <div class="logo-sub">Admin</div>
+    </div>
+    <div class="card">
+      <div id="admin-login-alert"></div>
+      <input type="password" id="admin-pass" placeholder="Password" onkeydown="if(event.key==='Enter')adminLogin()" />
+      <button class="btn" onclick="adminLogin()">Enter</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-admin">
+    <div class="admin-header">
+      <div class="logo" style="font-size:24px;text-align:left;">Canelli</div>
+      <button class="btn btn-ghost btn-sm" onclick="show('screen-home')">Exit</button>
+    </div>
+
+    <div class="metrics-grid" id="admin-metrics">
+      <div class="metric"><div class="metric-label">Customers</div><div class="metric-value" id="m-customers">—</div></div>
+      <div class="metric"><div class="metric-label">Rolls sold</div><div class="metric-value" id="m-rolls">—</div></div>
+      <div class="metric"><div class="metric-label">Rewards earned</div><div class="metric-value" id="m-rewards">—</div></div>
+      <div class="metric"><div class="metric-label">Pending redemption</div><div class="metric-value" id="m-pending">—</div></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" id="tab-customers" onclick="switchTab('customers')">Customers</button>
+      <button class="tab" id="tab-add" onclick="switchTab('add')">Add purchase</button>
+      <button class="tab" id="tab-export" onclick="switchTab('export')">Export</button>
+    </div>
+
+    <div id="panel-customers">
+      <input class="search-box" type="text" id="customer-search" placeholder="Search by name or email..." oninput="renderCustomers()" />
+      <div id="customer-list"><div class="loading-state">Loading customers...</div></div>
+    </div>
+
+    <div id="panel-add" style="display:none;">
+      <div class="card">
+        <div class="card-label">Find customer</div>
+        <div id="add-alert"></div>
+        <input class="search-box" type="text" id="add-search" placeholder="Search by name or email..." oninput="renderAddResults()" style="margin-bottom:0;" />
+        <div id="add-results" style="margin-top:8px;"></div>
+      </div>
+    </div>
+
+    <div id="panel-export" style="display:none;">
+      <div class="card">
+        <div class="card-label">Download CSV</div>
+        <p style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:1rem;">Export your full customer list to use in Mailchimp, Meta Ads, or Google Sheets.</p>
+        <button class="btn" onclick="exportCSV()">Download CSV</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SUPABASE_URL = 'https://gylexubsbwqaxtphcyft.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_A8ToDVhYANs6K5LSoap1qA_jyIg36CS';
+const ADMIN_PASSWORD = 'canelli2026';
+const ROLLS_NEEDED = 5;
+
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let allCustomers = [];
+
+async function initDB() {
+  await db.from('customers').select('id').limit(1);
+}
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = loading;
+  btn.innerHTML = loading ? '<span class="spinner"></span>Please wait...' : btn.dataset.label || btn.innerHTML;
+}
+
+function alert$(elId, msg, type) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  el.innerHTML = msg ? `<div class="alert alert-${type}">${msg}</div>` : '';
+}
+
+async function registerCustomer() {
+  const first = document.getElementById('reg-first').value.trim();
+  const last = document.getElementById('reg-last').value.trim();
+  const email = document.getElementById('reg-email').value.trim().toLowerCase();
+  const phone = document.getElementById('reg-phone').value.trim();
+
+  if (!first || !last || !email) return alert$('reg-alert', 'Please fill in your name and email.', 'error');
+  if (!/\S+@\S+\.\S+/.test(email)) return alert$('reg-alert', 'Please enter a valid email address.', 'error');
+
+  document.getElementById('reg-btn').dataset.label = 'Create my account';
+  setLoading('reg-btn', true);
+
+  const { data: existing } = await db.from('customers').select('id').eq('email', email).single();
+  if (existing) {
+    setLoading('reg-btn', false);
+    return alert$('reg-alert', 'An account with this email already exists. Use the login option instead.', 'error');
+  }
+
+  const { data, error } = await db.from('customers').insert([{
+    first_name: first,
+    last_name: last,
+    email,
+    phone,
+    rolls: 0,
+    total_rolls: 0,
+    rewards_earned: 0
+  }]).select().single();
+
+  setLoading('reg-btn', false);
+
+  if (error) return alert$('reg-alert', 'Something went wrong. Please try again.', 'error');
+
+  alert$('reg-alert', '', '');
+  renderDashboard(data);
+  show('screen-dashboard');
+}
+
+async function loginCustomer() {
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  if (!email) return alert$('login-alert', 'Please enter your email address.', 'error');
+
+  document.getElementById('login-btn').dataset.label = 'View my rewards';
+  setLoading('login-btn', true);
+
+  const { data, error } = await db.from('customers').select('*').eq('email', email).single();
+
+  setLoading('login-btn', false);
+
+  if (error || !data) return alert$('login-alert', 'No account found with that email.', 'error');
+
+  alert$('login-alert', '', '');
+  renderDashboard(data);
+  show('screen-dashboard');
+}
+
+function renderDashboard(c) {
+  document.getElementById('dash-greeting').textContent = `Hello, ${c.first_name}!`;
+  const dotsEl = document.getElementById('dash-dots');
+  dotsEl.innerHTML = '';
+  for (let i = 0; i < ROLLS_NEEDED; i++) {
+    const d = document.createElement('div');
+    d.className = 'roll-dot' + (i < c.rolls ? ' filled' : '');
+    d.textContent = i < c.rolls ? '🍥' : '';
+    dotsEl.appendChild(d);
+  }
+  const left = ROLLS_NEEDED - c.rolls;
+  document.getElementById('dash-progress').textContent = c.rolls >= ROLLS_NEEDED
+    ? 'You earned a reward!'
+    : `${left} more roll${left !== 1 ? 's' : ''} to earn $2 off`;
+  document.getElementById('dash-reward').innerHTML = c.rolls >= ROLLS_NEEDED
+    ? '<div class="reward-banner">Show this screen to Canelli to redeem your $2 off reward 🍥</div>'
+    : '';
+}
+
+function adminLogin() {
+  const pass = document.getElementById('admin-pass').value;
+  if (pass !== ADMIN_PASSWORD) return alert$('admin-login-alert', 'Incorrect password.', 'error');
+  alert$('admin-login-alert', '', '');
+  loadAdminData();
+  show('screen-admin');
+}
+
+async function loadAdminData() {
+  const { data } = await db.from('customers').select('*').order('created_at', { ascending: false });
+  allCustomers = data || [];
+
+  document.getElementById('m-customers').textContent = allCustomers.length;
+  document.getElementById('m-rolls').textContent = allCustomers.reduce((s, c) => s + c.total_rolls, 0);
+  document.getElementById('m-rewards').textContent = allCustomers.reduce((s, c) => s + c.rewards_earned, 0);
+  document.getElementById('m-pending').textContent = allCustomers.filter(c => c.rolls >= ROLLS_NEEDED).length;
+
+  renderCustomers();
+}
+
+function renderCustomers() {
+  const q = (document.getElementById('customer-search').value || '').toLowerCase();
+  const filtered = allCustomers.filter(c =>
+    (`${c.first_name} ${c.last_name}`).toLowerCase().includes(q) ||
+    c.email.toLowerCase().includes(q)
+  );
+  const list = document.getElementById('customer-list');
+  if (!filtered.length) {
+    list.innerHTML = '<p style="font-size:13px;color:var(--text-muted);text-align:center;padding:1.5rem 0;">No customers found.</p>';
+    return;
+  }
+  list.innerHTML = filtered.map(c => {
+    const dots = Array.from({length: ROLLS_NEEDED}, (_, i) =>
+      `<div class="mini-dot${i < c.rolls ? ' filled' : ''}"></div>`).join('');
+    const chip = c.rolls >= ROLLS_NEEDED ? '<span class="reward-chip">Reward ready</span>' : '';
+    return `<div class="customer-row">
+      <div style="flex:1;min-width:0;">
+        <div class="customer-name">${c.first_name} ${c.last_name}</div>
+        <div class="customer-meta">${c.email}${c.phone ? ' · ' + c.phone : ''}</div>
+        <div class="mini-dots">${dots}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;">
+        ${chip}
+        <button class="btn btn-navy btn-sm" onclick="addRoll('${c.id}')">+ Roll</button>
+        ${c.rolls >= ROLLS_NEEDED ? `<button class="btn btn-sm" onclick="redeemReward('${c.id}')">Redeem</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderAddResults() {
+  const q = (document.getElementById('add-search').value || '').toLowerCase();
+  const results = document.getElementById('add-results');
+  if (!q) { results.innerHTML = ''; return; }
+  const filtered = allCustomers.filter(c =>
+    (`${c.first_name} ${c.last_name}`).toLowerCase().includes(q) ||
+    c.email.toLowerCase().includes(q)
+  ).slice(0, 5);
+  if (!filtered.length) {
+    results.innerHTML = '<p style="font-size:13px;color:var(--text-muted);">No customer found.</p>';
+    return;
+  }
+  results.innerHTML = filtered.map(c =>
+    `<div class="customer-row">
+      <div>
+        <div class="customer-name">${c.first_name} ${c.last_name}</div>
+        <div class="customer-meta">${c.email}</div>
+      </div>
+      <button class="btn btn-navy btn-sm" onclick="quickAdd('${c.id}')">+ Roll</button>
+    </div>`
+  ).join('');
+}
+
+async function addRoll(id) {
+  const c = allCustomers.find(x => x.id === id);
+  if (!c || c.rolls >= ROLLS_NEEDED) return;
+  const newRolls = c.rolls + 1;
+  const { error } = await db.from('customers').update({
+    rolls: newRolls,
+    total_rolls: c.total_rolls + 1
+  }).eq('id', id);
+  if (!error) { c.rolls = newRolls; c.total_rolls++; updateMetrics(); renderCustomers(); }
+}
+
+async function redeemReward(id) {
+  const c = allCustomers.find(x => x.id === id);
+  if (!c) return;
+  const { error } = await db.from('customers').update({
+    rolls: 0,
+    rewards_earned: c.rewards_earned + 1
+  }).eq('id', id);
+  if (!error) { c.rolls = 0; c.rewards_earned++; updateMetrics(); renderCustomers(); }
+}
+
+async function quickAdd(id) {
+  await addRoll(id);
+  const c = allCustomers.find(x => x.id === id);
+  const msg = c.rolls >= ROLLS_NEEDED
+    ? `Purchase added for ${c.first_name}. Reward unlocked!`
+    : `Purchase added for ${c.first_name}. ${ROLLS_NEEDED - c.rolls} rolls left.`;
+  alert$('add-alert', msg, 'success');
+  document.getElementById('add-search').value = '';
+  document.getElementById('add-results').innerHTML = '';
+}
+
+function updateMetrics() {
+  document.getElementById('m-rolls').textContent = allCustomers.reduce((s, c) => s + c.total_rolls, 0);
+  document.getElementById('m-rewards').textContent = allCustomers.reduce((s, c) => s + c.rewards_earned, 0);
+  document.getElementById('m-pending').textContent = allCustomers.filter(c => c.rolls >= ROLLS_NEEDED).length;
+}
+
+function switchTab(tab) {
+  ['customers', 'add', 'export'].forEach(t => {
+    document.getElementById(`panel-${t}`).style.display = t === tab ? 'block' : 'none';
+    document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
+  });
+  if (tab === 'add') {
+    document.getElementById('add-search').value = '';
+    document.getElementById('add-results').innerHTML = '';
+    alert$('add-alert', '', '');
+  }
+}
+
+function exportCSV() {
+  const headers = ['First Name','Last Name','Email','Phone','Current Rolls','Total Rolls','Rewards Earned','Joined'];
+  const rows = allCustomers.map(c => [c.first_name, c.last_name, c.email, c.phone || '', c.rolls, c.total_rolls, c.rewards_earned, c.created_at]);
+  const csv = [headers, ...rows].map(r => r.map(v => `"${v || ''}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type: 'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'canelli-customers.csv';
+  a.click();
+}
+
+initDB();
+</script>
+</body>
+</html>
