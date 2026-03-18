@@ -160,7 +160,7 @@
       <div class="logo-sub-hero">REWARDS PROGRAM</div>
     </div>
     <div class="card">
-      <p class="welcome-text" style="color:var(--text-muted);">Every roll brings you closer. Buy 5, save <strong style="color:var(--red);">$2</strong> on your next order. Simple as that.</p>
+      <p class="welcome-text" style="color:var(--text-muted);">Every visit brings you closer. Come 5 times, save <strong style="color:var(--red);">$2</strong> on your next order. Simple as that.</p>
       <button class="btn" onclick="show('screen-register')">Join the Canelli Club — it's free</button>
       <button class="btn btn-outline" onclick="show('screen-login')">I'm already a member</button>
     </div>
@@ -216,7 +216,7 @@
     </div>
     <div class="dashboard-card">
       <div class="dashboard-label" style="font-size:18px;">How it works</div>
-      <p class="how-text">Buy 5 rolls, earn <strong>$2 off</strong> your next order. Show this screen to Canelli at your next visit to redeem.</p>
+      <p class="how-text">Visit us 5 times, earn <strong>$2 off</strong> your next order. Show this screen to Canelli at your next visit to redeem.</p>
     </div>
   </div>
 
@@ -322,7 +322,7 @@ function renderDashboard(c){
   const el=document.getElementById('dash-dots');el.innerHTML='';
   for(let i=0;i<ROLLS_NEEDED;i++){const d=document.createElement('div');d.className='roll-dot'+(i<c.rolls?' filled':'');d.textContent=i<c.rolls?'🍥':'';el.appendChild(d);}
   const left=ROLLS_NEEDED-c.rolls;
-  document.getElementById('dash-progress').textContent=c.rolls>=ROLLS_NEEDED?'You earned a reward!':left+' more roll'+(left!==1?'s':'')+' to earn $2 off';
+  document.getElementById('dash-progress').textContent=c.rolls>=ROLLS_NEEDED?'You earned a reward!':left+' more visit'+(left!==1?'s':'')+' to earn $2 off';
   document.getElementById('dash-reward').innerHTML=c.rolls>=ROLLS_NEEDED?'<div class="reward-banner">Show this screen to Canelli to redeem your  off reward 🍥</div>':'';
 }
 
