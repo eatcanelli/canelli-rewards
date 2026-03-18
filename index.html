@@ -333,8 +333,6 @@ async function loadAdminData(){
   const{data}=await db.from('customers').select('*').order('created_at',{ascending:false});
   allCustomers=data||[];
   document.getElementById('m-customers').textContent=allCustomers.length;
-  document.getElementById('m-rolls').textContent=allCustomers.reduce((s,c)=>s+c.total_rolls,0);
-  document.getElementById('m-rewards').textContent=allCustomers.reduce((s,c)=>s+c.rewards_earned,0);
   document.getElementById('m-pending').textContent=allCustomers.filter(c=>c.rolls>=ROLLS_NEEDED).length;
   renderCustomers();
 }
@@ -384,8 +382,7 @@ async function quickAdd(id){
 }
 
 function updateMetrics(){
-  document.getElementById('m-rolls').textContent=allCustomers.reduce((s,c)=>s+c.total_rolls,0);
-  document.getElementById('m-rewards').textContent=allCustomers.reduce((s,c)=>s+c.rewards_earned,0);
+  document.getElementById('m-customers').textContent=allCustomers.length;
   document.getElementById('m-pending').textContent=allCustomers.filter(c=>c.rolls>=ROLLS_NEEDED).length;
 }
 
