@@ -30,11 +30,12 @@
     --radius-sm: 9px;
   }
   body {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'DM Sans', sans-serif !important;
     background: var(--navy);
     min-height: 100vh;
     color: var(--text-light);
   }
+  #screen-dashboard * { font-family: 'DM Sans', sans-serif !important; }
   .app { max-width: 420px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
   .screen { display: none; }
   .screen.active { display: block; }
@@ -100,6 +101,7 @@
     border: 0.5px solid rgba(243,231,218,0.15);
     border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1rem;
     background: rgba(255,255,255,0.04);
+    font-family: 'DM Sans', sans-serif;
   }
   .dashboard-label { font-size: 20px; text-transform: none; letter-spacing: 0.01em; color: white; font-weight: 500; margin-bottom: 0.75rem; font-family: 'DM Sans', sans-serif; }
   .how-text { font-size: 16px; color: white; line-height: 1.7; font-family: 'DM Sans', sans-serif; }
