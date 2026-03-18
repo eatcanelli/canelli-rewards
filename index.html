@@ -358,7 +358,7 @@ function renderCustomers(){
   list.innerHTML=filtered.map(c=>{
     const dots=Array.from({length:ROLLS_NEEDED},(_,i)=>'<div class="mini-dot'+(i<c.rolls?' filled':'')+'"></div>').join('');
     const chip=c.rolls>=ROLLS_NEEDED?'<span class="reward-chip">Reward ready</span>':'';
-    return '<div class="customer-row"><div style="flex:1;min-width:0;"><div class="customer-name">'+c.first_name+' '+c.last_name+'</div><div class="customer-meta">'+c.email+(c.phone?' · '+c.phone:'')+'</div><div class="mini-dots">'+dots+'</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;">'+chip+'<button class="btn btn-navy btn-sm" onclick="addRoll(\''+c.id+'\')">+ Roll</button>'+(c.rolls>=ROLLS_NEEDED?'<button class="btn btn-sm" style="background:var(--red);color:white;" onclick="redeemReward(\''+c.id+'\')">Redeem</button>':'')+'</div></div>';
+    return '<div class="customer-row"><div style="flex:1;min-width:0;"><div class="customer-name">'+c.first_name+' '+c.last_name+'</div><div class="customer-meta">'+c.email+(c.phone?' · '+c.phone:'')+'</div><div class="mini-dots">'+dots+'</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;">'+chip+'<button class="btn btn-navy btn-sm" onclick="addRoll(\''+c.id+'\')">+ Visit</button>'+(c.rolls>=ROLLS_NEEDED?'<button class="btn btn-sm" style="background:var(--red);color:white;" onclick="redeemReward(\''+c.id+'\')">Redeem</button>':'')+'</div></div>';
   }).join('');
 }
 
@@ -368,7 +368,7 @@ function renderAddResults(){
   if(!q){results.innerHTML='';return;}
   const filtered=allCustomers.filter(c=>(c.first_name+' '+c.last_name).toLowerCase().includes(q)||c.email.toLowerCase().includes(q)||(c.phone&&c.phone.replace(/\D/g,'').slice(-4).includes(q))).slice(0,5);
   if(!filtered.length){results.innerHTML='<p style="font-size:13px;color:var(--text-muted);">No customer found.</p>';return;}
-  results.innerHTML=filtered.map(c=>'<div class="customer-row"><div><div class="customer-name">'+c.first_name+' '+c.last_name+'</div><div class="customer-meta">'+c.email+'</div></div><button class="btn btn-navy btn-sm" onclick="quickAdd(\''+c.id+'\')">+ Roll</button></div>').join('');
+  results.innerHTML=filtered.map(c=>'<div class="customer-row"><div><div class="customer-name">'+c.first_name+' '+c.last_name+'</div><div class="customer-meta">'+c.email+'</div></div><button class="btn btn-navy btn-sm" onclick="quickAdd(\''+c.id+'\')">+ Visit</button></div>').join('');
 }
 
 async function addRoll(id){
