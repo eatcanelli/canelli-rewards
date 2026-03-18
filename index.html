@@ -90,7 +90,7 @@
     font-size: 20px; transition: all 0.2s;
   }
   .roll-dot.filled { background: var(--red); border-color: var(--red); }
-  .progress-text { font-size: 16px; color: white; text-align: center; margin-bottom: 0.75rem; font-weight: 500; }
+  .progress-text { font-size: 16px; color: white; text-align: center; margin-bottom: 0.75rem; font-weight: 500; font-family: 'DM Sans', sans-serif; }
   .reward-banner {
     background: var(--red); border-radius: var(--radius-sm);
     padding: 12px 16px; text-align: center; color: white;
@@ -101,8 +101,8 @@
     border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1rem;
     background: rgba(255,255,255,0.04);
   }
-  .dashboard-label { font-size: 20px; text-transform: none; letter-spacing: 0.01em; color: white; font-weight: 500; margin-bottom: 0.75rem; }
-  .how-text { font-size: 16px; color: white; line-height: 1.7; }
+  .dashboard-label { font-size: 20px; text-transform: none; letter-spacing: 0.01em; color: white; font-weight: 500; margin-bottom: 0.75rem; font-family: 'DM Sans', sans-serif; }
+  .how-text { font-size: 16px; color: white; line-height: 1.7; font-family: 'DM Sans', sans-serif; }
   .how-text strong { color: white; }
   .alert { padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; margin-bottom: 12px; line-height: 1.5; }
   .alert-success { background: var(--success-bg); color: var(--success-text); }
@@ -317,7 +317,7 @@ function renderDashboard(c){
   const el=document.getElementById('dash-dots');el.innerHTML='';
   for(let i=0;i<ROLLS_NEEDED;i++){const d=document.createElement('div');d.className='roll-dot'+(i<c.rolls?' filled':'');d.textContent=i<c.rolls?'🍥':'';el.appendChild(d);}
   const left=ROLLS_NEEDED-c.rolls;
-  document.getElementById('dash-progress').textContent=c.rolls>=ROLLS_NEEDED?'You earned a reward!':left+' more roll'+(left!==1?'s':'')+' to earn  off';
+  document.getElementById('dash-progress').textContent=c.rolls>=ROLLS_NEEDED?'You earned a reward!':left+' more roll'+(left!==1?'s':'')+' to earn $2 off';
   document.getElementById('dash-reward').innerHTML=c.rolls>=ROLLS_NEEDED?'<div class="reward-banner">Show this screen to Canelli to redeem your  off reward 🍥</div>':'';
 }
 
