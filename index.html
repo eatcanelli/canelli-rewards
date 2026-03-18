@@ -330,11 +330,19 @@ function adminLogin(){
 }
 
 async function loadAdminData(){
-  const{data}=await db.from('customers').select('*').order('created_at',{ascending:false});
-  allCustomers=data||[];
-  document.getElementById('m-customers').textContent=allCustomers.length;
-  document.getElementById('m-pending').textContent=allCustomers.filter(c=>c.rolls>=ROLLS_NEEDED).length;
-  renderCustomers();
+  try {
+    const{data,error}=await db.from('customers').select('*').order('created_at',{ascending:false});
+    if(error){
+      document.getElementById('customer-list').innerHTML='<p style="color:var(--red);font-size:13px;padding:1rem 0;">Error loading data: '+error.message+'</p>';
+      return;
+    }
+    allCustomers=data||[];
+    document.getElementById('m-customers').textContent=allCustomers.length;
+    document.getElementById('m-pending').textContent=allCustomers.filter(c=>c.rolls>=ROLLS_NEEDED).length;
+    renderCustomers();
+  } catch(e){
+    document.getElementById('customer-list').innerHTML='<p style="color:var(--red);font-size:13px;padding:1rem 0;">Connection error: '+e.message+'</p>';
+  }
 }
 
 function renderCustomers(){
